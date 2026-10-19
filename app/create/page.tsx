@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -19,7 +19,7 @@ import { festivals, getFestivalById } from "@/app/lib/festivals";
 import { getTemplates } from "@/app/lib/templates";
 import { cardThemes } from "@/app/lib/themes";
 
-export default function CreatePage() {
+function CreateWishContent() {
   const searchParams = useSearchParams();
   const initialOccasion = searchParams.get("occasion") ?? "dussehra";
   const initialFrom = searchParams.get("from") ?? searchParams.get("sender") ?? "";
@@ -317,3 +317,31 @@ export default function CreatePage() {
     </div>
   );
 }
+
+function CreateLoadingFallback() {
+  return (
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950">
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center py-20 px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <span className="text-4xl animate-bounce" aria-hidden="true">
+            ✨
+          </span>
+          <p className="text-base font-medium text-gray-600 dark:text-gray-300">
+            Loading wish studio...
+          </p>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={<CreateLoadingFallback />}>
+      <CreateWishContent />
+    </Suspense>
+  );
+}
+
