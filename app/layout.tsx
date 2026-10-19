@@ -26,6 +26,9 @@ export const metadata: Metadata = {
     "WhatsApp wishes",
     "wish karo",
   ],
+  other: {
+    "google-adsense-account": "ca-pub-1894720951836503",
+  },
 };
 
 
