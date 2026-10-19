@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { decodeWishParams } from "@/app/lib/utils";
 import { getFestivalById } from "@/app/lib/festivals";
@@ -7,8 +8,12 @@ import Footer from "@/app/components/Footer";
 import AdBanner from "@/app/components/AdBanner";
 import WishViewerClient from "./WishViewerClient";
 
-export default async function WishPage(props: PageProps<"/wish">) {
-  const searchParams = await props.searchParams;
+async function WishContent({
+  searchParamsPromise,
+}: {
+  searchParamsPromise: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await searchParamsPromise;
   const wishData = decodeWishParams(searchParams);
 
   // Missing or corrupted parameters fallback
@@ -58,5 +63,32 @@ export default async function WishPage(props: PageProps<"/wish">) {
       festival={festival ?? null}
       theme={theme}
     />
+  );
+}
+
+function WishLoadingFallback() {
+  return (
+    <div className="flex min-h-screen flex-col bg-gray-950 text-white">
+      <Navbar />
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-20 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <span className="text-5xl animate-bounce" aria-hidden="true">
+            💌
+          </span>
+          <p className="text-base font-medium text-purple-200">
+            Unwrapping your special wish...
+          </p>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default function WishPage(props: PageProps<"/wish">) {
+  return (
+    <Suspense fallback={<WishLoadingFallback />}>
+      <WishContent searchParamsPromise={props.searchParams} />
+    </Suspense>
   );
 }

@@ -17,6 +17,28 @@ export default function Navbar() {
           </span>
         </Link>
 
+        {/* Center / Navigation Links */}
+        <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-gray-600 dark:text-gray-300">
+          <Link
+            href="/#festivals"
+            className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+          >
+            Festivals
+          </Link>
+          <Link
+            href="/about"
+            className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+          >
+            About
+          </Link>
+          <Link
+            href="/contact"
+            className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+          >
+            Contact
+          </Link>
+        </div>
+
         {/* CTA */}
         <Link
           href="/create"
@@ -29,4 +51,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
