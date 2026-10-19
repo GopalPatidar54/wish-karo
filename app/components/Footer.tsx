@@ -96,7 +96,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
-          <p>© {new Date().getFullYear()} Wish Karo. All rights reserved.</p>
+          <p>© 2026 Wish Karo. All rights reserved.</p>
           <p>
             Made with <span className="text-red-500">❤️</span> for spreading festive joy.
           </p>
