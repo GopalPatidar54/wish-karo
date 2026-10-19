@@ -16,6 +16,8 @@ export default function ShareActions({
   occasion,
   message,
   theme,
+  templateId,
+  language,
   disabled = false,
 }: {
   from: string;
@@ -23,6 +25,8 @@ export default function ShareActions({
   occasion: string;
   message: string;
   theme: string;
+  templateId?: number;
+  language?: "hi" | "en";
   disabled?: boolean;
 }) {
   const [isCopied, setIsCopied] = useState(false);
@@ -39,6 +43,8 @@ export default function ShareActions({
       occasion,
       message,
       theme,
+      templateId,
+      language,
     });
 
     const inviteText = buildWhatsAppInvitation({
@@ -70,7 +76,7 @@ export default function ShareActions({
     const success = await copyToClipboard(shareUrl);
     if (success) {
       setIsCopied(true);
-      showToast("Personalized link copied to clipboard! 🔗", "success");
+      showToast("Short personalized link copied to clipboard! 🔗", "success");
       setTimeout(() => setIsCopied(false), 2000);
     } else {
       showToast("Failed to copy link. Please try again.", "error");
@@ -122,9 +128,9 @@ export default function ShareActions({
             />
           </svg>
         }
-        aria-label="Copy wish link to clipboard"
+        aria-label="Copy short wish link to clipboard"
       >
-        {isCopied ? "Link Copied! ✓" : "Copy Wish Link"}
+        {isCopied ? "Link Copied! ✓" : "Copy Short Link"}
       </Button>
     </div>
   );

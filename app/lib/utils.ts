@@ -1,6 +1,10 @@
+import { getTemplateByIndex } from "./templates";
+
 /**
  * Builds a shareable wish URL using search parameters.
- * Encodes from (sender), to (recipient), occasion, message, and theme into query params.
+ * When templateId (1..15) and language ("hi" | "en") are provided, it encodes
+ * a compact 't' and 'lang' parameter, drastically shortening the URL.
+ * Falls back to 'message' parameter for custom user-written text.
  */
 export function buildShareUrl(
   origin: string,
@@ -8,8 +12,10 @@ export function buildShareUrl(
     from: string;
     to?: string;
     occasion: string;
-    message: string;
+    message?: string;
     theme?: string;
+    templateId?: number;
+    language?: "hi" | "en";
   }
 ): string {
   // Use configured public site URL if available, else supplied origin
@@ -22,9 +28,17 @@ export function buildShareUrl(
   }
   url.searchParams.set("occasion", params.occasion);
 
-  // Truncate very long messages for URL safety (keep ~800 chars)
-  const cleanMsg = params.message.trim().slice(0, 800);
-  url.searchParams.set("message", cleanMsg);
+  // Short URL path: if templateId is specified (1 to 15), pass compact params 't' and 'lang'
+  if (params.templateId && params.templateId >= 1 && params.templateId <= 15) {
+    url.searchParams.set("t", String(params.templateId));
+    if (params.language) {
+      url.searchParams.set("lang", params.language);
+    }
+  } else if (params.message && params.message.trim()) {
+    // Truncate custom user messages for URL safety
+    const cleanMsg = params.message.trim().slice(0, 800);
+    url.searchParams.set("message", cleanMsg);
+  }
 
   if (params.theme) {
     url.searchParams.set("theme", params.theme);
@@ -88,7 +102,8 @@ export type DecodedWish = {
 
 /**
  * Decodes wish parameters from search params safely.
- * Returns null if required sender or message is missing.
+ * Checks for compact 't' (template index 1-15) & 'lang', or falls back to 'message'.
+ * Returns null if required sender or message cannot be resolved.
  */
 export function decodeWishParams(searchParams: {
   [key: string]: string | string[] | undefined;
@@ -103,10 +118,23 @@ export function decodeWishParams(searchParams: {
   const occasion =
     typeof searchParams.occasion === "string" ? searchParams.occasion.trim() : "dussehra";
 
-  const message =
-    typeof searchParams.message === "string"
-      ? searchParams.message.trim().slice(0, 1000)
-      : "";
+  // Check for compact template parameter 't'
+  let message = "";
+  const rawT = searchParams.t;
+  const rawLang = searchParams.lang;
+  const lang: "hi" | "en" = rawLang === "en" ? "en" : "hi";
+
+  if (rawT) {
+    const tIndex = typeof rawT === "string" ? parseInt(rawT, 10) : 1;
+    if (!isNaN(tIndex) && tIndex >= 1 && tIndex <= 15) {
+      message = getTemplateByIndex(occasion, lang, tIndex);
+    }
+  }
+
+  // Fallback to explicit 'message' param (custom messages or legacy links)
+  if (!message && typeof searchParams.message === "string") {
+    message = searchParams.message.trim().slice(0, 1000);
+  }
 
   const theme =
     typeof searchParams.theme === "string" && searchParams.theme
